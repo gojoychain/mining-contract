@@ -36,7 +36,7 @@ contract('ProofOfContribution', (accounts) => {
         web3.utils.toBN('864000'))
       assert.equal(
         await contract.methods.lastWithdrawBlock().call(), 
-        wawait web3.eth.getBlockNumber())
+        await web3.eth.getBlockNumber())
     })
   })
 })
