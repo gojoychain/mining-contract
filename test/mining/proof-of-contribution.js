@@ -28,9 +28,15 @@ contract('ProofOfContribution', (accounts) => {
 
   describe('constructor', async () => {
     it('should initialize all the values correctly', async () => {
-      assert.equal(await contract.methods.withdrawAmount().call(), web3.utils.toBN('1000000000000000000000000'))
-      assert.equal(await contract.methods.withdrawInterval().call(), web3.utils.toBN('864000'))
-      assert.equal(await contract.methods.lastWithdrawBlock().call(), await web3.eth.getBlockNumber())
+      assert.equal(
+        await contract.methods.withdrawAmount().call(), 
+        web3.utils.toBN('1000000000000000000000000'))
+      assert.equal(
+        await contract.methods.withdrawInterval().call(), 
+        web3.utils.toBN('864000'))
+      assert.equal(
+        await contract.methods.lastWithdrawBlock().call(), 
+        wawait web3.eth.getBlockNumber())
     })
   })
 })
