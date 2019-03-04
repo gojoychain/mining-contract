@@ -63,7 +63,7 @@ contract('MiningContractMock', (accounts) => {
       await web3.eth.sendTransaction({
         from: OWNER,
         to: contract._address,
-        value: web3.utils.toBN('50000000000000000000'),
+        value: web3.utils.toBN('10000000000000000000'),
       })
       assert.isTrue(await web3.eth.getBalance(contract._address) > 0)
 
@@ -105,21 +105,37 @@ contract('MiningContractMock', (accounts) => {
       await web3.eth.sendTransaction({
         from: OWNER,
         to: contract._address,
-        value: web3.utils.toBN('50000000000000000000'),
+        value: web3.utils.toBN('10000000000000000000'),
       })
-      assert.isTrue(await web3.eth.getBalance(contract._address) > 0)
 
       // Advance to valid interval
       let lastWithdraw = await contract.methods.lastWithdrawBlock().call()
       let nextWithdraw = Number(lastWithdraw) + Number(withdrawInterval)
       await timeMachine.mineTo(nextWithdraw)
-      sassert.bnEqual(await web3.eth.getBlockNumber(), nextWithdraw)
 
       // Check updated lastWithdrawBlock
       await contract.methods.withdraw().send({ from: OWNER })
       sassert.bnEqual(
         await contract.methods.lastWithdrawBlock().call(), 
         nextWithdraw + 1)
+    })
+
+    it('emits the Withdrawal event', async () => {
+      // Fund contract
+      await web3.eth.sendTransaction({
+        from: OWNER,
+        to: contract._address,
+        value: web3.utils.toBN('10000000000000000000'),
+      })
+
+      // Advance to valid interval
+      let lastWithdraw = await contract.methods.lastWithdrawBlock().call()
+      let nextWithdraw = Number(lastWithdraw) + Number(withdrawInterval)
+      await timeMachine.mineTo(nextWithdraw)
+
+      // Check updated lastWithdrawBlock
+      const tx = await contract.methods.withdraw().send({ from: OWNER })
+      sassert.event(tx, 'Withdrawal')
     })
 
     it('throws if trying to withdraw from a non-owner', async () => {
