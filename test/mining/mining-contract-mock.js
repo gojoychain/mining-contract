@@ -68,21 +68,42 @@ contract('MiningContractMock', (accounts) => {
       assert.isTrue(await web3.eth.getBalance(contract._address) > 0)
 
       // Advance to valid interval
-      const lastWithdraw = await contract.methods.lastWithdrawBlock().call()
-      await timeMachine.mineTo(lastWithdraw + withdrawInterval)
-      sassert.bnEqual(await web3.eth.getBlockNumber(), lastWithdraw + withdrawInterval)
+      let lastWithdraw = await contract.methods.lastWithdrawBlock().call()
+      let nextWithdraw = Number(lastWithdraw) + Number(withdrawInterval)
+      await timeMachine.mineTo(nextWithdraw)
+      sassert.bnEqual(await web3.eth.getBlockNumber(), nextWithdraw)
 
       // Withdraw
-      let contractBal = await web3.eth.getBalance(contract._address)
-      let ownerBal = await web3.eth.getBalance(OWNER)
+      const contractBal1 = await web3.eth.getBalance(contract._address)
+      const ownerBal1 = await web3.eth.getBalance(OWNER)
       await contract.methods.withdraw().send({ from: OWNER })
       sassert.bnEqual(
         await web3.eth.getBalance(contract._address), 
-        web3.utils.toBN(contractBal).sub(web3.utils.toBN(withdrawAmount))),
+        web3.utils.toBN(contractBal1).sub(web3.utils.toBN(withdrawAmount))),
       sassert.bnGTE(
         await web3.eth.getBalance(OWNER),
-        ownerBal,
+        ownerBal1,
       )
+
+      // Advance to valid interval
+      lastWithdraw = await contract.methods.lastWithdrawBlock().call()
+      nextWithdraw = Number(lastWithdraw) + Number(withdrawInterval)
+      await timeMachine.mineTo(nextWithdraw)
+      sassert.bnEqual(await web3.eth.getBlockNumber(), nextWithdraw)
+
+      // Withdraw again
+      const contractBal2 = await web3.eth.getBalance(contract._address)
+      const ownerBal2 = await web3.eth.getBalance(OWNER)
+      await contract.methods.withdraw().send({ from: OWNER })
+      sassert.bnEqual(
+        await web3.eth.getBalance(contract._address), 
+        web3.utils.toBN(contractBal2).sub(web3.utils.toBN(withdrawAmount))),
+      sassert.bnGTE(
+        await web3.eth.getBalance(OWNER),
+        ownerBal2,
+      )
+      sassert.bnLTE(contractBal2, contractBal1)
+      sassert.bnGTE(ownerBal2, ownerBal1)
     })
 
     it('throws if trying to withdraw from a non-owner', async () => {
