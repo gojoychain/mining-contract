@@ -8,23 +8,23 @@ contract IMiningContract {
     event Withdrawal(address indexed to, uint256 amount);
 
     /**
+     * Withdraws the withdrawAmount if the currentBlock - lastWithdrawBlock >= withdrawInterval.
+     * @return Flag for successful withdrawal
+     */
+    function withdraw() public returns (bool success);
+
+    /**
      * @return Amount that can be withdrawn.
      */
-    function withdrawAmount() public view returns (uint256 withdrawAmount);
+    function withdrawAmount() public view returns (uint256 amount);
 
     /**
      * @return Minimum number of blocks between each allowed withdraw.
      */
-    function withdrawInterval() public view returns (uint256 withdrawInterval);
+    function withdrawInterval() public view returns (uint256 interval);
 
     /**
      * @return Block number of the last withdrawal.
      */ 
-    function lastWithdrawBlock() public view returns (uint256 lastWithdrawBlock);
-
-    /**
-     * Withdraws the withdrawAmount if the currentBlock - lastWithdrawBlock >= withdrawInterval.
-     * @return Flag for successful withdrawal
-     */
-    function withdraw() public returns (boolean success);
+    function lastWithdrawBlock() public view returns (uint256 lastBlock);
 }
