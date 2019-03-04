@@ -5,6 +5,8 @@ contract IMiningContract {
     uint256 internal _withdrawInterval;
     uint256 internal _lastWithdrawBlock;
 
+    event Withdrawal(address indexed to, uint256 amount);
+
     /**
      * @return Amount that can be withdrawn.
      */
