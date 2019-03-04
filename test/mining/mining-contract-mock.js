@@ -37,7 +37,7 @@ contract('MiningContractMock', (accounts) => {
       sassert.bnEqual(
         await contract.methods.withdrawAmount().call(), 
         '1000000000000000000')
-      sassert.bnEqual(await contract.methods.withdrawInterval().call(), '10')
+      sassert.bnEqual(await contract.methods.withdrawInterval().call(), '100')
       sassert.bnEqual(
         await contract.methods.lastWithdrawBlock().call(), 
         await web3.eth.getBlockNumber())
