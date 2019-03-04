@@ -8,7 +8,7 @@ contract MiningContractMock is MiningContract {
      */
     constructor(address owner) Ownable(owner) public validAddress(owner) {
         _withdrawAmount = 100 * 10**18;
-        _withdrawInterval = 100;
+        _withdrawInterval = 10;
         _lastWithdrawBlock = block.number;
     }
 }
