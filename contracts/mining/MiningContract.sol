@@ -3,6 +3,11 @@ pragma solidity ^0.5.4;
 import "./IMiningContract.sol";
 
 contract MiningContract is IMiningContract, Ownable {
+    modifier validAddress(address _address) {
+        require(_address != address(0), "Requires valid address.");
+        _;
+    }
+    
     function() external payable { }
 
     function withdraw() external onlyOwner returns (boolean success) {
