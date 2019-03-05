@@ -100,6 +100,40 @@ contract('MiningContractMock', (accounts) => {
       sassert.bnGTE(ownerBal2, ownerBal1)
     })
 
+    it('can withdraw multiple times if multiple intervals have passed', async () => {
+      // Fund contract
+      await web3.eth.sendTransaction({
+        from: OWNER,
+        to: contract._address,
+        value: web3.utils.toBN('10000000000000000000'),
+      })
+
+      // Advance two intervals
+      let lastWithdraw = await contract.methods.lastWithdrawBlock().call()
+      let nextWithdraw = Number(lastWithdraw) + (2 * Number(withdrawInterval))
+      await timeMachine.mineTo(nextWithdraw)
+
+      // Withdraw 1
+      const contractBal1 = await web3.eth.getBalance(contract._address)
+      const ownerBal1 = await web3.eth.getBalance(OWNER)
+      await contract.methods.withdraw().send({ from: OWNER })
+      sassert.bnEqual(
+        await web3.eth.getBalance(contract._address), 
+        web3.utils.toBN(contractBal1).sub(web3.utils.toBN(withdrawAmount))),
+      sassert.bnGTE(await web3.eth.getBalance(OWNER), ownerBal1)
+
+      // Withdraw 2, back to back
+      const contractBal2 = await web3.eth.getBalance(contract._address)
+      const ownerBal2 = await web3.eth.getBalance(OWNER)
+      await contract.methods.withdraw().send({ from: OWNER })
+      sassert.bnEqual(
+        await web3.eth.getBalance(contract._address), 
+        web3.utils.toBN(contractBal2).sub(web3.utils.toBN(withdrawAmount))),
+      sassert.bnGTE(await web3.eth.getBalance(OWNER), ownerBal2)
+      sassert.bnLTE(contractBal2, contractBal1)
+      sassert.bnGTE(ownerBal2, ownerBal1)
+    })
+
     it('sets the lastWithdrawBlock to the current block', async () => {
       // Fund contract
       await web3.eth.sendTransaction({
