@@ -2,8 +2,11 @@ pragma solidity ^0.5.4;
 
 import "./IMiningContract.sol";
 import "../lib/Ownable.sol";
+import "../lib/SafeMath.sol";
 
 contract MiningContract is IMiningContract, Ownable {
+    using SafeMath for uint256;
+    
     modifier validAddress(address _address) {
         require(_address != address(0), "Requires valid address.");
         _;
@@ -17,7 +20,7 @@ contract MiningContract is IMiningContract, Ownable {
             "Blocks from last withdrawal not greater than the withdraw interval."
         );
         
-        _lastWithdrawBlock = block.number;
+        _lastWithdrawBlock = _lastWithdrawBlock.add(_withdrawInterval);
         msg.sender.transfer(_withdrawAmount);
 
         emit Withdrawal(msg.sender, _withdrawAmount);
