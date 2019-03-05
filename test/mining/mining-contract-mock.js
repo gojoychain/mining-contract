@@ -134,7 +134,7 @@ contract('MiningContractMock', (accounts) => {
       sassert.bnGTE(ownerBal2, ownerBal1)
     })
 
-    it('sets the lastWithdrawBlock to the current block', async () => {
+    it('increments the lastWithdrawBlock by the withdrawInterval', async () => {
       // Fund contract
       await web3.eth.sendTransaction({
         from: OWNER,
@@ -151,7 +151,7 @@ contract('MiningContractMock', (accounts) => {
       await contract.methods.withdraw().send({ from: OWNER })
       sassert.bnEqual(
         await contract.methods.lastWithdrawBlock().call(), 
-        nextWithdraw + 1)
+        nextWithdraw)
     })
 
     it('emits the Withdrawal event', async () => {
