@@ -1,0 +1,28 @@
+{
+  "name": "mining-contract",
+  "version": "1.0.0",
+  "description": "GHU chain mining contracts",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "truffle test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ghuchain/mining-contract.git"
+  },
+  "author": "Deric Walintukan <deric@ghuchain.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ghuchain/mining-contract/issues"
+  },
+  "homepage": "https://github.com/ghuchain/mining-contract#readme",
+  "devDependencies": {
+    "bluebird": "^3.5.3",
+    "chai": "^4.2.0",
+    "sol-assert": "^1.1.0",
+    "sol-time-machine": "^1.0.0"
+  }
+}
