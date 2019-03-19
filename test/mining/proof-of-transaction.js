@@ -6,7 +6,7 @@ const ProofOfTransaction = artifacts.require('ProofOfTransaction')
 
 const web3 = global.web3
 
-contract.only('ProofOfTransaction', (accounts) => {
+contract('ProofOfTransaction', (accounts) => {
   const { OWNER, MAX_GAS } = getConstants(accounts)
   const timeMachine = new TimeMachine(web3)
   
