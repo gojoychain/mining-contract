@@ -3,7 +3,7 @@ pragma solidity ^0.5.4;
 import "../mining/ProofOfTransaction.sol";
 
 contract ProofOfTransactionMock is MiningContract {
-    uint256 internal constant MIN_WITHDRAW_AMOUNT = 5 * 10**17;
+    uint256 internal constant MIN_WITHDRAW_AMOUNT = 8 * 10**17;
     uint8 internal constant MAX_WITHDRAW_COUNTER = 2;
     uint8 internal _withdrawCounter = 0;
 
