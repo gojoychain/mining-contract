@@ -50,7 +50,7 @@ contract('ProofOfTransactionMock', (accounts) => {
       assert.isTrue(await web3.eth.getBalance(contractAddr) > 0)
     })
 
-    it('should increment the withdraw counter after a withdraw', async () => {
+    it('should increment the withdrawCounter after a withdraw', async () => {
       // Advance to valid interval
       let lastWithdraw = await methods.lastWithdrawBlock().call()
       let nextWithdraw = Number(lastWithdraw) + Number(withdrawInterval)
@@ -60,6 +60,28 @@ contract('ProofOfTransactionMock', (accounts) => {
       assert.equal(await methods.withdrawCounter().call(), 0)
       await methods.withdraw().send({ from: OWNER })
       assert.equal(await methods.withdrawCounter().call(), 1)
+    })
+
+    it('should reset the withdrawCounter if it hits the MAX_WITHDRAW_COUNTER', async () => {
+      // Advance to valid interval
+      let lastWithdraw = await methods.lastWithdrawBlock().call()
+      let nextWithdraw = Number(lastWithdraw) + Number(withdrawInterval)
+      await timeMachine.mineTo(nextWithdraw)
+      sassert.bnEqual(await web3.eth.getBlockNumber(), nextWithdraw)
+
+      // Withdraw 1
+      await methods.withdraw().send({ from: OWNER })
+      assert.equal(await methods.withdrawCounter().call(), 1)
+
+      // Advance to next interval
+      lastWithdraw = await methods.lastWithdrawBlock().call()
+      nextWithdraw = Number(lastWithdraw) + Number(withdrawInterval)
+      await timeMachine.mineTo(nextWithdraw)
+      sassert.bnEqual(await web3.eth.getBlockNumber(), nextWithdraw)
+
+      // Withdraw 2. Should reset back to 0.
+      await methods.withdraw().send({ from: OWNER })
+      assert.equal(await methods.withdrawCounter().call(), 0)
     })
   })
 })

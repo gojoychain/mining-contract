@@ -3,9 +3,9 @@ pragma solidity ^0.5.4;
 import "./MiningContract.sol";
 
 contract ProofOfTransaction is MiningContract {
-    uint256 private constant MIN_WITHDRAW_AMOUNT = 250000 * 10**18;
-    uint8 private constant MAX_WITHDRAW_COUNTER = 90;
-    uint8 private _withdrawCounter = 0;
+    uint256 internal constant MIN_WITHDRAW_AMOUNT = 250000 * 10**18;
+    uint8 internal constant MAX_WITHDRAW_COUNTER = 90;
+    uint8 internal _withdrawCounter = 0;
 
     /**
      * @param owner Owner of the contract.
@@ -24,9 +24,9 @@ contract ProofOfTransaction is MiningContract {
         
         _lastWithdrawBlock = _lastWithdrawBlock.add(_withdrawInterval);
         msg.sender.transfer(_withdrawAmount);
-
+        
         // Decrement withdrawAmount by 10% every quarter (90 days) until it hits 250k daily
-        _withdrawCounter++;
+        _withdrawCounter = _withdrawCounter + 1;
         if (_withdrawCounter == MAX_WITHDRAW_COUNTER) {
             uint256 newWithdraw = _withdrawAmount * 90 / 100;
             
