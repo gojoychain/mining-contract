@@ -4,7 +4,7 @@ import "./MiningContract.sol";
 
 contract ProofOfTransaction is MiningContract {
     uint256 internal constant INIT_WITHDRAW_AMOUNT = 400000 * 10**18;
-    uint256 internal constant MIN_WITHDRAW_AMOUNT = 250000 * 10**18;
+    uint256 internal constant MIN_WITHDRAW_AMOUNT = 200000 * 10**18;
     uint8 internal constant WITHDRAW_COUNTER_RESET = 90;
     uint8 internal _withdrawCounter = 0;
 
