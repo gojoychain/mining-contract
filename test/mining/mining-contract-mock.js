@@ -15,9 +15,10 @@ contract('MiningContractMock', (accounts) => {
   let withdrawAmount
   let withdrawInterval
 
-  beforeEach(async () => {
-    await timeMachine.snapshot
+  beforeEach(timeMachine.snapshot)
+  afterEach(timeMachine.revert)
 
+  beforeEach(async () => {
     const contract = await MiningContractMock.new(OWNER, 
       { from: OWNER, gas: MAX_GAS })
     contractAddr = contract.contract._address
@@ -27,10 +28,6 @@ contract('MiningContractMock', (accounts) => {
     withdrawInterval = await methods.withdrawInterval().call()
   })
   
-  afterEach(async () => {
-    await timeMachine.revert
-  })
-
   describe('constructor', () => {
     it('should initialize all the values correctly', async () => {
       sassert.bnEqual(await methods.withdrawAmount().call(), '1000000000000000000')

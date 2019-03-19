@@ -3,8 +3,8 @@ pragma solidity ^0.5.4;
 import "./MiningContract.sol";
 
 contract ProofOfTransaction is MiningContract {
-    uint256 private MIN_WITHDRAW_AMOUNT = 250000 * 10**18;
-    uint8 private MAX_WITHDRAW_COUNTER = 90;
+    uint256 private constant MIN_WITHDRAW_AMOUNT = 250000 * 10**18;
+    uint8 private constant MAX_WITHDRAW_COUNTER = 90;
     uint8 private _withdrawCounter = 0;
 
     /**
@@ -43,5 +43,9 @@ contract ProofOfTransaction is MiningContract {
         emit Withdrawal(msg.sender, _withdrawAmount);
 
         return true;
+    }
+
+    function withdrawCounter() public view returns (uint8 counter) {
+        return _withdrawCounter;
     }
 }
