@@ -6,4 +6,5 @@ module.exports = (accounts) => Object.freeze({
   ACCT4: accounts[4],
   ACCT5: accounts[5],
   INVALID_ADDR: '0x0000000000000000000000000000000000000000',
+  MAX_GAS: 4712388,
 })

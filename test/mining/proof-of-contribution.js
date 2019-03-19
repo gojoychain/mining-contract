@@ -2,24 +2,21 @@ const { assert } = require('chai')
 const TimeMachine = require('sol-time-machine')
 
 const getConstants = require('../constants')
-const ProofOfContribution = require('../data/proof-of-contribution')
+const ProofOfContribution = artifacts.require('ProofOfContribution')
 
 const web3 = global.web3
 
 contract('ProofOfContribution', (accounts) => {
-  const { OWNER } = getConstants(accounts)
+  const { OWNER, MAX_GAS } = getConstants(accounts)
   const timeMachine = new TimeMachine(web3)
   
-  let contract
+  let proofOfContrib, methods
 
   beforeEach(async () => {
     await timeMachine.snapshot
 
-    contract = new web3.eth.Contract(ProofOfContribution.abi)
-    contract = await contract.deploy({
-      data: ProofOfContribution.bytecode,
-      arguments: [OWNER],
-    }).send({ from: OWNER, gas: 4712388 })
+    proofOfContrib = await ProofOfContribution.new(OWNER, { from: OWNER, gas: MAX_GAS })
+    methods = proofOfContrib.contract.methods
   })
   
   afterEach(async () => {
@@ -29,13 +26,13 @@ contract('ProofOfContribution', (accounts) => {
   describe('constructor', async () => {
     it('should initialize all the values correctly', async () => {
       assert.equal(
-        await contract.methods.withdrawAmount().call(), 
+        await methods.withdrawAmount().call(), 
         web3.utils.toBN('1000000000000000000000000'))
       assert.equal(
-        await contract.methods.withdrawInterval().call(), 
+        await methods.withdrawInterval().call(), 
         web3.utils.toBN('864000'))
       assert.equal(
-        await contract.methods.lastWithdrawBlock().call(), 
+        await methods.lastWithdrawBlock().call(), 
         await web3.eth.getBlockNumber())
     })
   })

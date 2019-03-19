@@ -1,11 +1,11 @@
 pragma solidity ^0.5.4;
 
-import "./MiningContract.sol";
+import "../mining/MiningContract.sol";
 
-contract ProofOfTransaction is MiningContract {
-    uint256 internal constant INIT_WITHDRAW_AMOUNT = 400000 * 10**18;
-    uint256 internal constant MIN_WITHDRAW_AMOUNT = 200000 * 10**18;
-    uint8 internal constant WITHDRAW_COUNTER_RESET = 90;
+contract ProofOfTransactionMock is MiningContract {
+    uint256 internal constant INIT_WITHDRAW_AMOUNT = 1 * 10**18;
+    uint256 internal constant MIN_WITHDRAW_AMOUNT = 8 * 10**17;
+    uint8 internal constant WITHDRAW_COUNTER_RESET = 2;
     uint8 internal _withdrawCounter = 0;
 
     /**
@@ -13,7 +13,7 @@ contract ProofOfTransaction is MiningContract {
      */
     constructor(address owner) Ownable(owner) public validAddress(owner) {
         _withdrawAmount = INIT_WITHDRAW_AMOUNT;
-        _withdrawInterval = 3600 * 24 / 3;
+        _withdrawInterval = 10;
         _lastWithdrawBlock = block.number;
     }
 
