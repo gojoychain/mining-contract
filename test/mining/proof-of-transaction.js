@@ -66,7 +66,7 @@ contract('ProofOfTransactionMock', (accounts) => {
       assert.equal(await methods.withdrawCounter().call(), 1)
     })
 
-    it('should reset the withdrawCounter if it hits the MAX_WITHDRAW_COUNTER', async () => {
+    it('should reset the withdrawCounter if it hits the WITHDRAW_COUNTER_RESET', async () => {
       // Advance to valid interval
       let lastWithdraw = await methods.lastWithdrawBlock().call()
       let nextWithdraw = Number(lastWithdraw) + Number(withdrawInterval)
@@ -88,7 +88,7 @@ contract('ProofOfTransactionMock', (accounts) => {
       assert.equal(await methods.withdrawCounter().call(), 0)
     })
 
-    it('should execute the logic if it hits the MAX_WITHDRAW_COUNTER', async () => {
+    it('should execute the logic if it hits the WITHDRAW_COUNTER_RESET', async () => {
       // 10e18
       let withdrawAmount = await methods.withdrawAmount().call();
 
