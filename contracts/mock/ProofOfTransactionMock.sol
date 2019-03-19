@@ -1,6 +1,6 @@
 pragma solidity ^0.5.4;
 
-import "../mining/ProofOfTransaction.sol";
+import "../mining/MiningContract.sol";
 
 contract ProofOfTransactionMock is MiningContract {
     uint256 internal constant INIT_WITHDRAW_AMOUNT = 1 * 10**18;
