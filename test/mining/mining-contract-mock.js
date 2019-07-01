@@ -8,7 +8,7 @@ const MiningContractMock = artifacts.require('MiningContractMock')
 const web3 = global.web3
 
 contract('MiningContractMock', (accounts) => {
-  const { OWNER, ACCT1, MAX_GAS } = getConstants(accounts)
+  const { OWNER, ACCT1, MAX_GAS, INVALID_ADDR } = getConstants(accounts)
   const timeMachine = new TimeMachine(web3)
   
   let contractAddr, methods
@@ -30,11 +30,21 @@ contract('MiningContractMock', (accounts) => {
   
   describe('constructor', () => {
     it('should initialize all the values correctly', async () => {
+      assert.equal(await methods.owner().call(), OWNER)
+      assert.equal(await methods.receiver().call(), OWNER)
       sassert.bnEqual(await methods.withdrawAmount().call(), '1000000000000000000')
       sassert.bnEqual(await methods.withdrawInterval().call(), '100')
       sassert.bnEqual(
         await methods.lastWithdrawBlock().call(), 
         await web3.eth.getBlockNumber())
+    })
+
+    it('throws if passing an invalid owner', async () => {
+      try {
+        await MiningContractMock.new(INVALID_ADDR, { from: OWNER, gas: MAX_GAS })
+      } catch (e) {
+        sassert.revert(e, 'Requires valid address.')
+      }
     })
   })
 
