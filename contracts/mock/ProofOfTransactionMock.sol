@@ -8,7 +8,7 @@ contract ProofOfTransactionMock is ProofOfTransaction {
     uint8 internal constant WITHDRAW_COUNTER_RESET = 2;
     uint8 internal _withdrawCounter = 0;
 
-    constructor(address owner) ProofOfTransaction(owner) public {
+    constructor(address payable owner) ProofOfTransaction(owner) public {
         _withdrawAmount = INIT_WITHDRAW_AMOUNT;
         _withdrawInterval = 10;
         _lastWithdrawBlock = block.number;

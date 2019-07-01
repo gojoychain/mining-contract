@@ -12,8 +12,8 @@ contract MiningContract is IMiningContract, Ownable {
         _;
     }
 
-    constructor(address owner) Ownable(owner) public validAddress(owner) {
-        _receiver = owner;
+    constructor(address payable owner) Ownable(owner) public validAddress(owner) {
+        _receiver = address(owner);
     }
 
     function() external payable { }
@@ -31,7 +31,7 @@ contract MiningContract is IMiningContract, Ownable {
     }
 
     function setReceiver(
-        address newReceiver)
+        address payable newReceiver)
         public
         onlyOwner
         validAddress(newReceiver)

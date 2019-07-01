@@ -11,7 +11,7 @@ contract ProofOfTransaction is MiningContract {
     /**
      * @param owner Owner of the contract.
      */
-    constructor(address owner) MiningContract(owner) public {
+    constructor(address payable owner) MiningContract(owner) public {
         _withdrawAmount = INIT_WITHDRAW_AMOUNT;
         _withdrawInterval = 3600 * 24 / 3;
         _lastWithdrawBlock = block.number;

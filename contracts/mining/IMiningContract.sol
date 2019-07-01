@@ -1,7 +1,7 @@
 pragma solidity ^0.5.10;
 
 contract IMiningContract {
-    address internal _receiver;
+    address payable internal _receiver;
     uint256 internal _withdrawAmount;
     uint256 internal _withdrawInterval;
     uint256 internal _lastWithdrawBlock;
@@ -13,13 +13,13 @@ contract IMiningContract {
      * Withdraws the withdrawAmount if the currentBlock - lastWithdrawBlock >= withdrawInterval.
      * @return Flag for successful withdrawal
      */
-    function withdraw() public returns (bool success);
+    function withdraw() public;
     
     /**
      * Sets a new receiver address to receive tokens upon withdraw.
      * @param newReceiver New receiver
      */
-    function setReceiver(address newReceiver) public;
+    function setReceiver(address payable newReceiver) public;
 
     /**
      * @return Address who will receive the tokens.
