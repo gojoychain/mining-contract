@@ -1,6 +1,7 @@
 pragma solidity ^0.5.4;
 
 contract IMiningContract {
+    address internal _receiver;
     uint256 internal _withdrawAmount;
     uint256 internal _withdrawInterval;
     uint256 internal _lastWithdrawBlock;

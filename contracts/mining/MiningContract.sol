@@ -28,15 +28,19 @@ contract MiningContract is IMiningContract, Ownable {
         return true;
     }
 
-    function withdrawAmount() public view returns (uint256 amount) {
+    function receiver() public view returns (address) {
+        return _receiver;
+    }
+
+    function withdrawAmount() public view returns (uint256) {
         return _withdrawAmount;
     }
 
-    function withdrawInterval() public view returns (uint256 interval) {
+    function withdrawInterval() public view returns (uint256) {
         return _withdrawInterval;
     }
 
-    function lastWithdrawBlock() public view returns (uint256 lastBlock) {
+    function lastWithdrawBlock() public view returns (uint256) {
         return _lastWithdrawBlock;
     }
 }
