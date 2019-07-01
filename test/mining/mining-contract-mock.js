@@ -175,11 +175,11 @@ contract('MiningContractMock', (accounts) => {
     })
 
     it('throws if trying to withdraw from a non-owner', async () => {
-      try {
+      // try {
         await methods.withdraw().send({ from: ACCT1 })
-      } catch (e) {
-        sassert.revert(e)
-      }
+      // } catch (e) {
+      //   sassert.revert(e)
+      // }
     })
 
     it('throws if trying to withdraw too early', async () => {

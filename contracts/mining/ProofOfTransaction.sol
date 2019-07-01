@@ -14,7 +14,6 @@ contract ProofOfTransaction is MiningContract {
     constructor(address payable owner) MiningContract(owner) public {
         _withdrawAmount = INIT_WITHDRAW_AMOUNT;
         _withdrawInterval = 3600 * 24 / 3;
-        _lastWithdrawBlock = block.number;
     }
 
     function withdraw() public {

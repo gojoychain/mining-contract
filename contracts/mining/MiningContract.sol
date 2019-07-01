@@ -14,6 +14,7 @@ contract MiningContract is IMiningContract, Ownable {
 
     constructor(address payable owner) Ownable(owner) public validAddress(owner) {
         _receiver = owner;
+        _lastWithdrawBlock = block.number;
     }
 
     function() external payable { }

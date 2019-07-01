@@ -9,6 +9,5 @@ contract MiningContractMock is MiningContract {
     constructor(address payable owner) MiningContract(owner) public {
         _withdrawAmount = 1 * 10**18;
         _withdrawInterval = 100;
-        _lastWithdrawBlock = block.number;
     }
 }

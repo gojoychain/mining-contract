@@ -11,6 +11,5 @@ contract ProofOfTransactionMock is ProofOfTransaction {
     constructor(address payable owner) ProofOfTransaction(owner) public {
         _withdrawAmount = INIT_WITHDRAW_AMOUNT;
         _withdrawInterval = 10;
-        _lastWithdrawBlock = block.number;
     }
 }

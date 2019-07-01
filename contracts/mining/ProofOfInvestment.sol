@@ -9,6 +9,5 @@ contract ProofOfInvestment is MiningContract {
     constructor(address payable owner) MiningContract(owner) public {
         _withdrawAmount = 3000000 * 10**18;
         _withdrawInterval = 864000;
-        _lastWithdrawBlock = block.number;
     }
 }
