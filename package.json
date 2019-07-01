@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "GHU chain mining contracts",
   "main": "truffle-config.js",
+  "engines": {
+    "node": "10.x"
+  },
   "directories": {
     "test": "test"
   },
@@ -22,7 +25,7 @@
   "devDependencies": {
     "bluebird": "^3.5.3",
     "chai": "^4.2.0",
-    "sol-assert": "^1.1.1",
+    "sol-assert": "^1.2.1",
     "sol-time-machine": "^1.0.0"
   }
 }
