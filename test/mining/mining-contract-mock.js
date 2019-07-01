@@ -40,11 +40,9 @@ contract('MiningContractMock', (accounts) => {
     })
 
     it('throws if passing an invalid owner', async () => {
-      try {
-        await MiningContractMock.new(INVALID_ADDR, { from: OWNER, gas: MAX_GAS })
-      } catch (e) {
-        sassert.revert(e, 'Requires valid address.')
-      }
+      await sassert.revert(
+        MiningContractMock.new(INVALID_ADDR, { from: OWNER, gas: MAX_GAS }),
+        'Requires valid address.')
     })
   })
 
@@ -63,6 +61,9 @@ contract('MiningContractMock', (accounts) => {
 
   describe('withdraw', () => {
     describe('valid block', () => {
+      let lastWithdraw
+      let nextWithdraw
+
       beforeEach(async () => {
         // Fund contract
         await web3.eth.sendTransaction({
@@ -73,8 +74,8 @@ contract('MiningContractMock', (accounts) => {
         assert.isTrue(await web3.eth.getBalance(contractAddr) > 0)
 
         // Advance to valid interval
-        let lastWithdraw = await methods.lastWithdrawBlock().call()
-        let nextWithdraw = Number(lastWithdraw) + Number(withdrawInterval)
+        lastWithdraw = await methods.lastWithdrawBlock().call()
+        nextWithdraw = Number(lastWithdraw) + Number(withdrawInterval)
         await timeMachine.mineTo(nextWithdraw)
         sassert.bnEqual(await web3.eth.getBlockNumber(), nextWithdraw)
       })
@@ -136,7 +137,7 @@ contract('MiningContractMock', (accounts) => {
       
       it('increments the lastWithdrawBlock by the withdrawInterval', async () => {
         await methods.withdraw().send({ from: OWNER })
-        sassert.bnEqual(await methods.lastWithdrawBlock().call(), nextWithdraw)
+        assert.equal(await methods.lastWithdrawBlock().call(), nextWithdraw)
       })
 
       it('emits the Withdrawal event', async () => {
