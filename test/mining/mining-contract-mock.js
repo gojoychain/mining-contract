@@ -8,7 +8,7 @@ const MiningContractMock = artifacts.require('MiningContractMock')
 const web3 = global.web3
 
 contract('MiningContractMock', (accounts) => {
-  const { OWNER, ACCT1, MAX_GAS, INVALID_ADDR } = getConstants(accounts)
+  const { OWNER, ACCT1, ACCT2, MAX_GAS, INVALID_ADDR } = getConstants(accounts)
   const timeMachine = new TimeMachine(web3)
   
   let contractAddr, methods
@@ -110,8 +110,8 @@ contract('MiningContractMock', (accounts) => {
 
       it('can withdraw multiple times if multiple intervals have passed', async () => {
         // Advance two intervals
-        let lastWithdraw = await methods.lastWithdrawBlock().call()
-        let nextWithdraw = Number(lastWithdraw) + (2 * Number(withdrawInterval))
+        lastWithdraw = await methods.lastWithdrawBlock().call()
+        nextWithdraw = Number(lastWithdraw) + (2 * Number(withdrawInterval))
         await timeMachine.mineTo(nextWithdraw)
   
         // Withdraw 1
@@ -134,10 +134,26 @@ contract('MiningContractMock', (accounts) => {
         sassert.bnLTE(contractBal2, contractBal1)
         sassert.bnGTE(ownerBal2, ownerBal1)
       })
+
+      it('allows anyone to withdraw', async () => {
+        lastWithdraw = await methods.lastWithdrawBlock().call()
+        nextWithdraw = Number(lastWithdraw) + Number(withdrawInterval)
+        await timeMachine.mineTo(nextWithdraw)
+
+        assert.equal(await methods.receiver().call(), OWNER)
+        const contractBal = await web3.eth.getBalance(contractAddr)
+        const receiverBal = await web3.eth.getBalance(OWNER)
+
+        assert.equal(await methods.owner().call(), OWNER)
+        await methods.withdraw().send({ from: ACCT1 })
+        sassert.bnGT(await methods.lastWithdrawBlock().call(), lastWithdraw)
+        sassert.bnLT(await web3.eth.getBalance(contractAddr), contractBal)
+        sassert.bnGT(await web3.eth.getBalance(OWNER), receiverBal)
+      })
       
       it('increments the lastWithdrawBlock by the withdrawInterval', async () => {
         await methods.withdraw().send({ from: OWNER })
-        assert.equal(await methods.lastWithdrawBlock().call(), nextWithdraw)
+        sassert.bnEqual(await methods.lastWithdrawBlock().call(), nextWithdraw)
       })
 
       it('emits the Withdrawal event', async () => {
@@ -156,6 +172,29 @@ contract('MiningContractMock', (accounts) => {
           methods.withdraw().send({ from: OWNER }),
           'Blocks from last withdrawal not greater than the withdraw interval.')
       })
+    })
+  })
+
+  describe('setReceiver', () => {
+    it('sets the receiver', async () => {
+      assert.equal(await methods.receiver().call(), OWNER)
+
+      await methods.setReceiver(ACCT1).send({ from: OWNER })
+      assert.equal(await methods.receiver().call(), ACCT1)
+
+      await methods.setReceiver(ACCT2).send({ from: OWNER })
+      assert.equal(await methods.receiver().call(), ACCT2)
+    })
+
+    it('emits the ReceiverSet event', async () => {
+      const tx = await methods.setReceiver(ACCT1).send({ from: OWNER })
+      sassert.event(tx, 'ReceiverSet')
+    })
+
+    it('throws if setting an invalid address', async () => {
+      await sassert.revert(
+        methods.setReceiver(INVALID_ADDR).send({ from: OWNER }),
+        'Requires valid address.')
     })
   })
 })
