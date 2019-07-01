@@ -17,14 +17,14 @@ contract ProofOfTransaction is MiningContract {
         _lastWithdrawBlock = block.number;
     }
 
-    function withdraw() public onlyOwner returns (bool success) {
+    function withdraw() public {
         require(
             block.number - _lastWithdrawBlock >= _withdrawInterval, 
             "Blocks from last withdrawal not greater than the withdraw interval."
         );
         
         _lastWithdrawBlock = _lastWithdrawBlock.add(_withdrawInterval);
-        msg.sender.transfer(_withdrawAmount);
+        _receiver.transfer(_withdrawAmount);
         
         // Decrement withdrawAmount by 10% every quarter (90 days) until it hits 250k daily
         _withdrawCounter = _withdrawCounter + 1;
@@ -41,9 +41,7 @@ contract ProofOfTransaction is MiningContract {
             _withdrawCounter = 0;
         }
 
-        emit Withdrawal(msg.sender, _withdrawAmount);
-
-        return true;
+        emit Withdrawal(_receiver, _withdrawAmount);
     }
 
     function withdrawCounter() public view returns (uint8 counter) {
