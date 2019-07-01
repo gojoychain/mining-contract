@@ -28,6 +28,18 @@ contract MiningContract is IMiningContract, Ownable {
         return true;
     }
 
+    function setReceiver(
+        address newReceiver)
+        public
+        onlyOwner
+        validAddress(newReceiver)
+    {
+        address old = _receiver;
+        _receiver = newReceiver;
+
+        emit ReceiverSet(old, newReceiver);
+    }
+
     function receiver() public view returns (address) {
         return _receiver;
     }
