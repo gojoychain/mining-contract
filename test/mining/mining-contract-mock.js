@@ -6,6 +6,7 @@ const getConstants = require('../constants')
 const MiningContractMock = artifacts.require('MiningContractMock')
 
 const web3 = global.web3
+const { toBN } = web3.utils
 
 contract('MiningContractMock', (accounts) => {
   const { OWNER, ACCT1, ACCT2, MAX_GAS, INVALID_ADDR } = getConstants(accounts)
@@ -133,6 +134,34 @@ contract('MiningContractMock', (accounts) => {
         sassert.bnGTE(await web3.eth.getBalance(OWNER), ownerBal2)
         sassert.bnLTE(contractBal2, contractBal1)
         sassert.bnGTE(ownerBal2, ownerBal1)
+      })
+
+      it('sends tokens to the receiver', async () => {
+        // Withdraw to OWNER
+        let contractBal = await web3.eth.getBalance(contractAddr)
+        let userBal = await web3.eth.getBalance(OWNER)
+        await methods.withdraw().send({ from: OWNER })
+        sassert.bnEqual(
+          await web3.eth.getBalance(contractAddr), 
+          toBN(contractBal).sub(toBN(withdrawAmount))),
+        sassert.bnGT(await web3.eth.getBalance(OWNER), userBal)
+
+        // Advance to next withdraw
+        lastWithdraw = await methods.lastWithdrawBlock().call()
+        nextWithdraw = Number(lastWithdraw) + Number(withdrawInterval)
+        await timeMachine.mineTo(nextWithdraw)
+
+        // Set ACCT1 as receiver
+        await methods.setReceiver(ACCT1).send({ from: OWNER })
+        assert.equal(await methods.receiver().call(), ACCT1)
+        contractBal = await web3.eth.getBalance(contractAddr)
+        userBal = await web3.eth.getBalance(ACCT1)
+
+        await methods.withdraw().send({ from: ACCT1 })
+        sassert.bnEqual(
+          await web3.eth.getBalance(contractAddr), 
+          toBN(contractBal).sub(toBN(withdrawAmount))),
+        sassert.bnGT(await web3.eth.getBalance(ACCT1), userBal)
       })
 
       it('allows anyone to withdraw', async () => {
