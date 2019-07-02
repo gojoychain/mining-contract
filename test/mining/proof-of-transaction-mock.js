@@ -14,7 +14,7 @@ const decrementAmount = (withdrawAmount) => {
 }
 
 contract('ProofOfTransactionMock', (accounts) => {
-  const { OWNER, MAX_GAS } = getConstants(accounts)
+  const { OWNER, ACCT1, MAX_GAS } = getConstants(accounts)
   const timeMachine = new TimeMachine(web3)
   
   let contractAddr, methods
@@ -44,6 +44,8 @@ contract('ProofOfTransactionMock', (accounts) => {
   })
 
   describe('withdraw', () => {
+    let lastWithdraw, nextWithdraw
+
     beforeEach(async () => {
       // Fund contract
       await web3.eth.sendTransaction({
@@ -52,27 +54,21 @@ contract('ProofOfTransactionMock', (accounts) => {
         value: web3.utils.toBN('50000000000000000000'),
       })
       assert.isTrue(await web3.eth.getBalance(contractAddr) > 0)
+
+      // Advance to valid interval
+      lastWithdraw = await methods.lastWithdrawBlock().call()
+      nextWithdraw = Number(lastWithdraw) + Number(withdrawInterval)
+      await timeMachine.mineTo(nextWithdraw)
+      sassert.bnEqual(await web3.eth.getBlockNumber(), nextWithdraw)
     })
 
     it('should increment the withdrawCounter after a withdraw', async () => {
-      // Advance to valid interval
-      let lastWithdraw = await methods.lastWithdrawBlock().call()
-      let nextWithdraw = Number(lastWithdraw) + Number(withdrawInterval)
-      await timeMachine.mineTo(nextWithdraw)
-      sassert.bnEqual(await web3.eth.getBlockNumber(), nextWithdraw)
-
       assert.equal(await methods.withdrawCounter().call(), 0)
       await methods.withdraw().send({ from: OWNER })
       assert.equal(await methods.withdrawCounter().call(), 1)
     })
 
     it('should reset the withdrawCounter if it hits the WITHDRAW_COUNTER_RESET', async () => {
-      // Advance to valid interval
-      let lastWithdraw = await methods.lastWithdrawBlock().call()
-      let nextWithdraw = Number(lastWithdraw) + Number(withdrawInterval)
-      await timeMachine.mineTo(nextWithdraw)
-      sassert.bnEqual(await web3.eth.getBlockNumber(), nextWithdraw)
-
       // Withdraw 1
       await methods.withdraw().send({ from: OWNER })
       assert.equal(await methods.withdrawCounter().call(), 1)
@@ -91,12 +87,6 @@ contract('ProofOfTransactionMock', (accounts) => {
     it('should execute the logic if it hits the WITHDRAW_COUNTER_RESET', async () => {
       // 10e18
       let withdrawAmount = await methods.withdrawAmount().call();
-
-      // Advance to valid interval
-      let lastWithdraw = await methods.lastWithdrawBlock().call()
-      let nextWithdraw = Number(lastWithdraw) + Number(withdrawInterval)
-      await timeMachine.mineTo(nextWithdraw)
-      sassert.bnEqual(await web3.eth.getBlockNumber(), nextWithdraw)
 
       // Withdraw 1
       await methods.withdraw().send({ from: OWNER })
@@ -186,6 +176,42 @@ contract('ProofOfTransactionMock', (accounts) => {
       await methods.withdraw().send({ from: OWNER })
       assert.equal(await methods.withdrawCounter().call(), 0)
       assert.equal(await methods.withdrawAmount().call(), withdrawAmount)
+    })
+
+    it('allows anyone to withdraw', async () => {
+      // Get previous balances
+      assert.equal(await methods.receiver().call(), OWNER)
+      let contractBal = await web3.eth.getBalance(contractAddr)
+      let receiverBal = await web3.eth.getBalance(OWNER)
+
+      // receiver OWNER withdraws
+      await methods.withdraw().send({ from: OWNER })
+      sassert.bnGT(await methods.lastWithdrawBlock().call(), lastWithdraw)
+      sassert.bnLT(await web3.eth.getBalance(contractAddr), contractBal)
+      sassert.bnGT(await web3.eth.getBalance(OWNER), receiverBal)
+
+      // Advance to next interval
+      lastWithdraw = await methods.lastWithdrawBlock().call()
+      nextWithdraw = Number(lastWithdraw) + Number(withdrawInterval)
+      await timeMachine.mineTo(nextWithdraw)
+      sassert.bnEqual(await web3.eth.getBlockNumber(), nextWithdraw)
+
+      // Change receiver to ACCT1
+      await methods.setReceiver(ACCT1).send({ from: OWNER })
+      assert.equal(await methods.receiver().call(), ACCT1)
+      contractBal = await web3.eth.getBalance(contractAddr)
+      receiverBal = await web3.eth.getBalance(ACCT1)
+
+      // receiver ACCT1 withdraws
+      await methods.withdraw().send({ from: ACCT1 })
+      sassert.bnGT(await methods.lastWithdrawBlock().call(), lastWithdraw)
+      sassert.bnLT(await web3.eth.getBalance(contractAddr), contractBal)
+      sassert.bnGT(await web3.eth.getBalance(ACCT1), receiverBal)
+    })
+
+    it('emits the Withdrawl event', async () => {
+      const tx = await methods.withdraw().send({ from: OWNER })
+      sassert.event(tx, 'Withdrawal')
     })
   })
 })

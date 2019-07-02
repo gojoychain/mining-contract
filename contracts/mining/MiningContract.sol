@@ -1,4 +1,4 @@
-pragma solidity ^0.5.4;
+pragma solidity ^0.5.10;
 
 import "./IMiningContract.sol";
 import "../lib/Ownable.sol";
@@ -12,31 +12,50 @@ contract MiningContract is IMiningContract, Ownable {
         _;
     }
 
+    constructor(address payable owner) Ownable(owner) public validAddress(owner) {
+        _receiver = owner;
+        _lastWithdrawBlock = block.number;
+    }
+
     function() external payable { }
 
-    function withdraw() public onlyOwner returns (bool success) {
+    function withdraw() public {
         require(
             block.number - _lastWithdrawBlock >= _withdrawInterval, 
             "Blocks from last withdrawal not greater than the withdraw interval."
         );
         
         _lastWithdrawBlock = _lastWithdrawBlock.add(_withdrawInterval);
-        msg.sender.transfer(_withdrawAmount);
+        _receiver.transfer(_withdrawAmount);
 
-        emit Withdrawal(msg.sender, _withdrawAmount);
-
-        return true;
+        emit Withdrawal(_receiver, _withdrawAmount);
     }
 
-    function withdrawAmount() public view returns (uint256 amount) {
+    function setReceiver(
+        address payable newReceiver)
+        public
+        onlyOwner
+        validAddress(newReceiver)
+    {
+        address old = _receiver;
+        _receiver = newReceiver;
+
+        emit ReceiverSet(old, newReceiver);
+    }
+
+    function receiver() public view returns (address) {
+        return _receiver;
+    }
+
+    function withdrawAmount() public view returns (uint256) {
         return _withdrawAmount;
     }
 
-    function withdrawInterval() public view returns (uint256 interval) {
+    function withdrawInterval() public view returns (uint256) {
         return _withdrawInterval;
     }
 
-    function lastWithdrawBlock() public view returns (uint256 lastBlock) {
+    function lastWithdrawBlock() public view returns (uint256) {
         return _lastWithdrawBlock;
     }
 }

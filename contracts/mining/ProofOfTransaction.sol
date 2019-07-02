@@ -1,4 +1,4 @@
-pragma solidity ^0.5.4;
+pragma solidity ^0.5.10;
 
 import "./MiningContract.sol";
 
@@ -11,20 +11,19 @@ contract ProofOfTransaction is MiningContract {
     /**
      * @param owner Owner of the contract.
      */
-    constructor(address owner) Ownable(owner) public validAddress(owner) {
+    constructor(address payable owner) MiningContract(owner) public {
         _withdrawAmount = INIT_WITHDRAW_AMOUNT;
         _withdrawInterval = 3600 * 24 / 3;
-        _lastWithdrawBlock = block.number;
     }
 
-    function withdraw() public onlyOwner returns (bool success) {
+    function withdraw() public {
         require(
             block.number - _lastWithdrawBlock >= _withdrawInterval, 
             "Blocks from last withdrawal not greater than the withdraw interval."
         );
         
         _lastWithdrawBlock = _lastWithdrawBlock.add(_withdrawInterval);
-        msg.sender.transfer(_withdrawAmount);
+        _receiver.transfer(_withdrawAmount);
         
         // Decrement withdrawAmount by 10% every quarter (90 days) until it hits 250k daily
         _withdrawCounter = _withdrawCounter + 1;
@@ -41,9 +40,7 @@ contract ProofOfTransaction is MiningContract {
             _withdrawCounter = 0;
         }
 
-        emit Withdrawal(msg.sender, _withdrawAmount);
-
-        return true;
+        emit Withdrawal(_receiver, _withdrawAmount);
     }
 
     function withdrawCounter() public view returns (uint8 counter) {
